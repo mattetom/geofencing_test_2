@@ -17,15 +17,7 @@ FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-  final InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid);
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-   runApp(MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -65,19 +57,6 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         geofenceState = data;
       });
-
-      const AndroidNotificationDetails androidNotificationDetails =
-          AndroidNotificationDetails('your channel id', 'your channel name',
-              channelDescription: 'your channel description',
-              importance: Importance.max,
-              priority: Priority.high,
-              ticker: 'ticker');
-      const NotificationDetails notificationDetails =
-          NotificationDetails(android: androidNotificationDetails);
-      await flutterLocalNotificationsPlugin.show(
-          0, 'Geofencing', 'Event: $data', notificationDetails,
-          payload: 'item x');
-
     });
     initPlatformState();
   }
@@ -115,6 +94,24 @@ class _MyAppState extends State<MyApp> {
   @pragma('vm:entry-point')
   static void callback(List<String> ids, Location l, GeofenceEvent e) async {
     print('Fences: $ids Location $l Event: $e');
+    const AndroidNotificationDetails androidNotificationDetails =
+    AndroidNotificationDetails('your channel id', 'your channel name',
+        channelDescription: 'your channel description',
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker');
+    const NotificationDetails notificationDetails =
+    NotificationDetails(android: androidNotificationDetails);
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+    const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+    final InitializationSettings initializationSettings =
+    InitializationSettings(android: initializationSettingsAndroid);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await flutterLocalNotificationsPlugin.show(
+        0, 'Geofencing', 'Event: $e', notificationDetails,
+        payload: 'item x');
     final SendPort send =
         IsolateNameServer.lookupPortByName('geofencing_send_port');
     send?.send(e.toString());
@@ -123,6 +120,10 @@ class _MyAppState extends State<MyApp> {
   Future<void> initPlatformState() async {
     print('Initializing...');
     await GeofencingManager.initialize();
+    final registeredIds = await GeofencingManager.getRegisteredGeofenceIds();
+    setState(() {
+      registeredGeofences = registeredIds;
+    });
     print('Initialization done');
   }
 
