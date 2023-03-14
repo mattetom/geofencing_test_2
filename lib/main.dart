@@ -95,8 +95,8 @@ class _MyAppState extends State<MyApp> {
   static void callback(List<String> ids, Location l, GeofenceEvent e) async {
     print('Fences: $ids Location $l Event: $e');
     const AndroidNotificationDetails androidNotificationDetails =
-    AndroidNotificationDetails('your channel id', 'your channel name',
-        channelDescription: 'your channel description',
+    AndroidNotificationDetails('geofence', 'Geofence',
+        channelDescription: 'Notification about geofencing',
         importance: Importance.max,
         priority: Priority.high,
         ticker: 'ticker');
